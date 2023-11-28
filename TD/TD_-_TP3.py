@@ -423,6 +423,7 @@ class Modele:
         self.round_started = False
         self.start = 0
         self.projectiles = []
+        self.argent_par_creep = 15
         x_position_tour = 5
         y_position_tour = 5
         type_tour = "standard"
@@ -445,6 +446,8 @@ class Modele:
 
     def delete_creep(self):
         self.creeps.pop(0)
+        self.argent += self.argent_par_creep
+
 
     def lose_life(self, creep):
         self.vie -= 1
@@ -501,6 +504,7 @@ class Controler:
             self.vue.afficher_temps(f"{time.time() - self.modele.start:0.2f}")
             self.modele.deplacer_creeps()
             self.vue.afficher_creep()
+            self.vue.afficher_argent()
             self.vue.id = self.vue.root.after(20, self.start_loop)
             for projectile in self.modele.projectiles:
                 projectile.deplacer_vers_cible()
