@@ -178,6 +178,8 @@ class Vue:
     def bind_start_game(self):
        self.root.bind("<space>", self.parent.start_game)
 
+    def bind_upgrade(self):
+        self.root.bind('a', lambda event: self.afficher_amelioration())
 
 
     def afficher_debut(self):
@@ -475,6 +477,7 @@ class Controler:
         self.vue = Vue(self, self.modele)
         self.vue.afficher_creep()
         self.vue.bind_start_game()
+        self.vue.bind_upgrade()
         # self.vue.afficher_demarrage()
         # self.boucler()
 
@@ -489,7 +492,6 @@ class Controler:
             if not self.modele.round_started:
                 if time.time() - self.modele.time_round_ended <= 10:
                     self.vue.bind_escape()
-                    self.vue.bind_a()
                 else:
                     self.modele.start_round()
             for tour in self.modele.tours:
