@@ -87,7 +87,7 @@ class Vue:
 
                 elif self.sentier[p][i] == "CS":
                     self.canevas.create_rectangle(x, y, x + self.modele.taille_case, y + self.modele.taille_case,
-                                                  fill="wheat1", )
+                                                  fill="wheat1",)
 
                 elif self.sentier[p][i] == "CC":
                     self.canevas.create_rectangle(x, y, x + self.modele.taille_case, y + self.modele.taille_case,
@@ -303,8 +303,8 @@ class Projectile:
 
             # Vérifier si le projectile a atteint sa cible (ou à proximité)
             if math.sqrt((self.cible.x - self.x) ** 2 + (self.cible.y - self.y) ** 2) < self.vitesse:
-                self.x = 100000
-                self.y = 100000
+                self.parent.delete_projectile()
+
 
 
 
@@ -328,10 +328,10 @@ class Tour:
             if self.trouver_cible(cible) == True:
                 force = 10
                 empoisone = False
-                vitesse = 20
+                vitesse = 10
                 type_projectile = "standard"
-                projectile = Projectile(self, cible, force, empoisone, vitesse, type_projectile)
-                self.parent.ajouter_projectile(projectile)
+                self.projectile = Projectile(self, cible, force, empoisone, vitesse, type_projectile)
+                self.parent.ajouter_projectile(self.projectile)
                 self.dernier_tir = time.time()
 
     def ameliorer(self):
@@ -344,7 +344,8 @@ class Tour:
             print("a porter")
             return True
 
-
+    def delete_projectile(self):
+        self.parent.projectiles.remove(self.projectile)
 
 
 
@@ -358,7 +359,7 @@ class Creep:
         self.mana = mana
         self.empoisone = False
         self.temps_empoisone = 0
-        self.speed = 30
+        self.speed = 10
         self.creep_check_points = [(3, 17), (9, 17), (9, 5), (25, 5), (25, 10), (15, 10), (15, 17), (27, 17)]
         for i, point in enumerate(self.creep_check_points):
             self.creep_check_points[i] = (point[0] * self.parent.taille_case, point[1] * self.parent.taille_case)
@@ -447,6 +448,10 @@ class Modele:
 
     def ajouter_projectile(self, projectile):
         self.projectiles.append(projectile)
+
+    def delete_projectile(self, projectile):
+        self.parent.projectiles.remove(projectile)
+
 
 class Controler:
     def __init__(self):
