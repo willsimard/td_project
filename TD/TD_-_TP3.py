@@ -212,46 +212,57 @@ class Vue:
         self.canevas.data['start_y'] = cur_y
 
     def afficher_tour_poison(self):
-        taille_case = self.modele.taille_case
+        if self.modele.argent >= self.modele.cout_init_poi:
+            self.modele.argent -= self.modele.cout_init_poi
+            self.afficher_argent()
+            taille_case = self.modele.taille_case
 
-        for tour in self.modele.tours:
-            x = 15 * taille_case
-            y = 19 * taille_case
-            self.tour = self.canevas.create_rectangle(x + taille_case / 2, y + taille_case / 2,
-                                                      x + taille_case * 1.5, y + taille_case * 1.5,
-                                                      fill="DarkGoldenrod1")
+            for tour in self.modele.tours:
+                x = 15 * taille_case
+                y = 19 * taille_case
+                self.tour = self.canevas.create_rectangle(x + taille_case / 2, y + taille_case / 2,
+                                                          x + taille_case * 1.5, y + taille_case * 1.5,
+                                                          fill="DarkGoldenrod1")
 
-        self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
-        self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
-        self.canevas.tag_bind(self.tour, '<<ButtonRelease-1>', lambda e: self.tourPoison.append(self.tour))
+            self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
+            self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
+            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourPoison.append(self.tour))
+
+
 
     def afficher_tour_projectile(self):
-        taille_case = self.modele.taille_case
+        if self.modele.argent >= self.modele.cout_init_pro:
+            self.modele.argent -= self.modele.cout_init_pro
+            self.afficher_argent()
+            taille_case = self.modele.taille_case
 
-        for tour in self.modele.tours:
-            x = 15 * taille_case
-            y = 19 * taille_case
-            self.tour = self.canevas.create_rectangle(x + taille_case / 2, y + taille_case / 2,
-                                                      x + taille_case * 1.5,
-                                                      y + taille_case * 1.5, fill="Red")
+            for tour in self.modele.tours:
+                x = 15 * taille_case
+                y = 19 * taille_case
+                self.tour = self.canevas.create_rectangle(x + taille_case / 2, y + taille_case / 2,
+                                                          x + taille_case * 1.5,
+                                                          y + taille_case * 1.5, fill="Red")
 
-        self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
-        self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
-        self.canevas.tag_bind(self.tour, '<<ButtonRelease-1>', lambda e: self.tourProjectile.append(self.tour))
+            self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
+            self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
+            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourProjectile.append(self.tour))
 
     def afficher_tour_eclaire(self):
-        taille_case = self.modele.taille_case
+        if self.modele.argent >= self.modele.cout_init_ecl:
+            self.modele.argent -= self.modele.cout_init_ecl
+            self.afficher_argent()
+            taille_case = self.modele.taille_case
 
-        for tour in self.modele.tours:
-            x = 15 * taille_case
-            y = 19 * taille_case
-            self.tour = self.canevas.create_rectangle(x + taille_case / 2, y + taille_case / 2,
-                                                      x + taille_case * 1.5,
-                                                      y + taille_case * 1.5, fill="deep sky blue")
+            for tour in self.modele.tours:
+                x = 15 * taille_case
+                y = 19 * taille_case
+                self.tour = self.canevas.create_rectangle(x + taille_case / 2, y + taille_case / 2,
+                                                          x + taille_case * 1.5,
+                                                          y + taille_case * 1.5, fill="deep sky blue")
 
-        self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
-        self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
-        self.canevas.tag_bind(self.tour, '<<ButtonRelease-1>', lambda e: self.tourEclaire.append(self.tour))
+            self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
+            self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
+            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourEclaire.append(self.tour))
 
     def afficher_amelioration(self):
         canvas2 = Canvas(self.canevas, width=600, height=150, bg="old lace")
