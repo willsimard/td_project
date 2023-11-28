@@ -319,7 +319,7 @@ class Projectile:
 
             # Vérifier si le projectile a atteint sa cible (ou à proximité)
             if math.sqrt((self.cible.x - self.x) ** 2 + (self.cible.y - self.y) ** 2) < self.vitesse:
-                self.parent.delete_projectile()
+                self.parent.delete_projectile(self)
                 self.parent.parent.delete_creep()
 
 
@@ -348,8 +348,8 @@ class Tour:
                 empoisone = False
                 vitesse = 10
                 type_projectile = "standard"
-                self.projectile = Projectile(self, cible, force, empoisone, vitesse, type_projectile)
-                self.parent.ajouter_projectile(self.projectile)
+                projectile = Projectile(self, cible, force, empoisone, vitesse, type_projectile)
+                self.parent.ajouter_projectile(projectile)
                 self.dernier_tir = time.time()
 
     def ameliorer(self):
@@ -362,8 +362,8 @@ class Tour:
             print("a porter")
             return True
 
-    def delete_projectile(self):
-        self.parent.projectiles.remove(self.projectile)
+    def delete_projectile(self, projectile):
+        self.parent.projectiles.remove(projectile)
 
 
 class Creep:
@@ -471,7 +471,7 @@ class Modele:
         self.projectiles.append(projectile)
 
     def delete_projectile(self, projectile):
-        self.parent.projectiles.remove(projectile)
+        self.projectiles.remove(projectile)
 
 
 class Controler:
