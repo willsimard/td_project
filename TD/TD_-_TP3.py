@@ -275,7 +275,7 @@ class Projectile:
         self.position_cible = (self.cible.x, self.cible.y)
         self.cibleX = cible.x
         self.cibleY = cible.y
-        print(cible.x,cible.y)
+        ##print(cible.x,cible.y)
 
     def deplacer_vers_cible(self):
         if self.cible:
@@ -307,26 +307,36 @@ class Tour:
         self.cout_amelioration = cout_amelioration
         self.range = range
         self.dernier_tir = 0
-        self.intervalle_tir = 5
+        self.intervalle_tir = 2
 
     def peut_tirer(self):
         return time.time() - self.dernier_tir >= self.intervalle_tir
 
     def attacker(self, cible):
         if self.peut_tirer():
-            force = 10
-            empoisone = False
-            vitesse = 20
-            type_projectile = "standard"
-            projectile = Projectile(self, cible, force, empoisone, vitesse, type_projectile)
-            self.parent.ajouter_projectile(projectile)
-            self.dernier_tir = time.time()
+            if self.trouver_cible(cible) == True:
+                force = 10
+                empoisone = False
+                vitesse = 20
+                type_projectile = "standard"
+                projectile = Projectile(self, cible, force, empoisone, vitesse, type_projectile)
+                self.parent.ajouter_projectile(projectile)
+                self.dernier_tir = time.time()
 
     def ameliorer(self):
         pass
 
-    def trouver_cible(self):
-        pass
+    def trouver_cible(self, cible):
+        distance = math.sqrt((cible.x - self.x) ** 2 + (cible.y - self.y) ** 2)
+        if distance <= self.range:
+            print(distance)
+            print("a porter")
+            return True
+
+
+
+
+
 
 
 class Creep:
@@ -390,10 +400,11 @@ class Modele:
         y_position_tour = 5
         type_tour = "standard"
         cout_amelioration = 50
-        range_tour = 100000
+        range_tour = 102
 
         tour_test = Tour(self, x_position_tour, y_position_tour, type_tour, cout_amelioration, range_tour)
         self.tours.append(tour_test)
+        print("range tour", range_tour)
 
     def deplacer_creeps(self):
         for creep in self.creeps:
