@@ -118,9 +118,9 @@ class Vue:
         self.boutton_poi.place(x=self.modele.taille_case * 15, y=self.modele.taille_case * 21.5,
                                height=self.modele.taille_case * 1.5, width=self.modele.taille_case * 3)
 
-        self.boutton_upgrade = Button(self.cadre_jeu, text="Amélioration", font=("Arial", 13))
-        self.boutton_upgrade.place(x=self.modele.taille_case * 19, y=self.modele.taille_case * 21.5,
-                                   height=self.modele.taille_case * 1.5, width=self.modele.taille_case * 3)
+       ## self.boutton_upgrade = Button(self.cadre_jeu, text="Amélioration", font=("Arial", 13))
+        ##self.boutton_upgrade.place(x=self.modele.taille_case * 19, y=self.modele.taille_case * 21.5,
+                                  ## height=self.modele.taille_case * 1.5, width=self.modele.taille_case * 3)
 
         self.label_nbr_vies = Label(self.cadre_jeu, text="Nbr de vies\n" + str(self.modele.vie), font=("Arial", 13))
         self.label_nbr_vies.place(x=self.modele.taille_case * 25, y=self.modele.taille_case * 21,
@@ -133,7 +133,7 @@ class Vue:
         self.boutton_pro.bind("<ButtonRelease-1>", lambda event: (self.afficher_tour_projectile()))
         self.boutton_ecl.bind("<ButtonRelease-1>", lambda event: (self.afficher_tour_eclaire()))
         self.boutton_poi.bind("<ButtonRelease-1>", lambda event: (self.afficher_tour_poison()))
-        self.boutton_upgrade.bind("<ButtonRelease-1>", lambda event: (self.afficher_amelioration()))
+       # self.boutton_upgrade.bind("<ButtonRelease-1>", lambda event: (self.afficher_amelioration()))
 
     def afficher_vie(self):
         self.label_nbr_vies.config(text="Nbr de vies\n" + str(self.modele.vie))
@@ -174,9 +174,12 @@ class Vue:
     def on_escape(self, event):
         self.root.unbind("<Escape>")
         self.modele.start_round()
-
+        
     def bind_start_game(self):
-        self.root.bind("<space>", self.parent.start_game)
+       self.root.bind("<space>", self.parent.start_game)
+
+    def bind_upgrade(self):
+       self.root.bind('a', lambda event: self.afficher_amelioration())
 
     def afficher_debut(self):
         self.label_debut = Label(self.root, text="Bienvenue à Tower Defense!", font=("Arial", 25))
@@ -265,14 +268,26 @@ class Vue:
             self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourEclaire.append(self.tour))
 
     def afficher_amelioration(self):
-        canvas2 = Canvas(self.canevas, width=600, height=150, bg="old lace")
-        self.canevas.create_window(100, 75, window=canvas2)
+        taille_case = self.modele.taille_case
+        x = taille_case
+        y = taille_case
+        self.canvas2 = Canvas(self.canevas, width=400, height=150, bg="old lace")
+        self.canevas.create_window(200, 75, window=self.canvas2)
 
-        self.boutton_close = Button(canvas2, text="X", font=("Arial", 13), bg="Red")
-        self.boutton_close.place(x=580, y=0)
-        self.boutton_close.bind("<ButtonRelease-1>", lambda event: canvas2.destroy())
+        self.boutton_close = Button(self.canvas2, text="X", font=("Arial", 13), bg="Red")
+        self.boutton_close.place(x=380, y=0)
+        self.carre = self.canvas2.create_rectangle(20 ,50,
+                                                      x + taille_case*1.2, 
+                                               y + taille_case*3 , fill="deep sky blue")
 
-
+        self.canvas2.create_text(200,15, text="Améliorations", fill="black", font="Arial")
+        
+       
+        self.boutton_close.bind("<ButtonRelease-1>", lambda event: self.canvas2.destroy())
+        #self.canvas2.pack()
+    
+        
+        
 class Projectile:
     def __init__(self, parent, cible, force, empoisone, vitesse, type):
         self.x, self.y = parent.x, parent.y
@@ -459,6 +474,7 @@ class Controler:
         self.vue = Vue(self, self.modele)
         self.vue.afficher_creep()
         self.vue.bind_start_game()
+        self.vue.bind_upgrade()
         # self.vue.afficher_demarrage()
         # self.boucler()
 
@@ -473,6 +489,7 @@ class Controler:
             if not self.modele.round_started:
                 if time.time() - self.modele.time_round_ended <= 10:
                     self.vue.bind_escape()
+                    self.vue.bind_a()
                 else:
                     self.modele.start_round()
             for tour in self.modele.tours:
