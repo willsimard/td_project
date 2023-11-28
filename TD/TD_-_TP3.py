@@ -178,8 +178,7 @@ class Vue:
     def bind_start_game(self):
        self.root.bind("<space>", self.parent.start_game)
 
-    def bind_upgrade(self):
-       self.root.bind('a', lambda event: self.afficher_amelioration())
+
 
     def afficher_debut(self):
         self.label_debut = Label(self.root, text="Bienvenue à Tower Defense!", font=("Arial", 25))
@@ -230,7 +229,7 @@ class Vue:
             self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
             self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
             self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourPoison.append(self.tour))
-
+            self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
 
 
     def afficher_tour_projectile(self):
@@ -249,7 +248,7 @@ class Vue:
             self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
             self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
             self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourProjectile.append(self.tour))
-
+            self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
     def afficher_tour_eclaire(self):
         if self.modele.argent >= self.modele.cout_init_ecl:
             self.modele.argent -= self.modele.cout_init_ecl
@@ -266,7 +265,7 @@ class Vue:
             self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
             self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
             self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourEclaire.append(self.tour))
-
+            self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
     def afficher_amelioration(self):
         taille_case = self.modele.taille_case
         x = taille_case
@@ -476,7 +475,6 @@ class Controler:
         self.vue = Vue(self, self.modele)
         self.vue.afficher_creep()
         self.vue.bind_start_game()
-        self.vue.bind_upgrade()
         # self.vue.afficher_demarrage()
         # self.boucler()
 
