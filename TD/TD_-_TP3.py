@@ -319,6 +319,8 @@ class Projectile:
             # Vérifier si le projectile a atteint sa cible (ou à proximité)
             if math.sqrt((self.cible.x - self.x) ** 2 + (self.cible.y - self.y) ** 2) < self.vitesse:
                 self.parent.delete_projectile()
+                self.parent.parent.delete_creep()
+
 
 
 
@@ -361,9 +363,6 @@ class Tour:
 
     def delete_projectile(self):
         self.parent.projectiles.remove(self.projectile)
-
-
-
 
 
 class Creep:
@@ -442,6 +441,9 @@ class Modele:
         case_y = 0
         self.creeps.append(Creep(self, case_x * self.taille_case, case_y * self.taille_case, self.mana_init * self.niveau))
         self.creep_cree -= 1
+
+    def delete_creep(self):
+        self.creeps.pop(0)
 
     def lose_life(self, creep):
         self.vie -= 1
