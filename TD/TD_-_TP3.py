@@ -178,7 +178,7 @@ class Vue:
         self.modele.start_round()
 
     def bind_start_game(self):
-        self.root.bind("<space>", self.parent.start_game)
+       self.root.bind("<space>", self.parent.start_game)
 
     def bind_upgrade(self):
         self.root.bind('a', lambda event: self.afficher_amelioration())
@@ -188,8 +188,7 @@ class Vue:
         self.label_debut.pack()
         self.boutton_debut = Button(self.root, text="Jouer", font=("Arial", 25))
         self.boutton_debut.pack()
-        self.boutton_debut.bind("<ButtonRelease-1>", lambda event: (
-        self.creer_page_jeu(), self.boutton_debut.forget(), self.label_debut.forget()))
+        self.boutton_debut.bind("<ButtonRelease-1>", lambda event: (self.creer_page_jeu(), self.boutton_debut.forget(), self.label_debut.forget()))
 
     def afficher_projectiles(self):
         self.canevas.delete("projectile")
@@ -217,13 +216,6 @@ class Vue:
         self.canevas.move(self.tour, cur_x - self.canevas.data['start_x'], cur_y - self.canevas.data['start_y'])
         self.canevas.data['start_x'] = cur_x
         self.canevas.data['start_y'] = cur_y
-    def on_release(self,event):
-        self.canevas.tag_unbind(self.tour, '<ButtonPress-1>')
-        self.canevas.tag_unbind(self.tour, '<B1-Motion>')
-        self.canevas.tag_unbind(self.tour, '<ButtonRelease-1>')
-        self.canevas.tag_unbind(self.tour, '<Button-3>')
-        self.tourProjectile.append(self.tour)
-        self.modele.tours.append(Tour(self.modele, event.x / self.modele.taille_case,event.y / self.modele.taille_case,"standard",10,300))
 
     def afficher_tour_poison(self):
         if self.modele.argent >= self.modele.cout_init_poi:
@@ -288,11 +280,10 @@ class Vue:
 
         self.boutton_close = Button(self.canvas2, text="X", font=("Arial", 13), bg="Red")
         self.boutton_close.place(x=380, y=0)
-        self.carre = self.canvas2.create_rectangle(20, 50, x + taille_case * 1.5, y + taille_case * 3,
-                                                   fill="deep sky blue")
+        self.carre = self.canvas2.create_rectangle(20, 50, x + taille_case*1.5, y + taille_case*3, fill="deep sky blue")
 
-        self.canvas2.create_text(200, 15, text="Améliorations", fill="black", font="Arial")
-        self.canvas2.create_text(40, 65, text="Cout", fill="black", font="Arial")
+        self.canvas2.create_text(200,15, text="Améliorations", fill="black", font="Arial")
+        self.canvas2.create_text(40,65, text="Cout", fill="black", font="Arial")
 
         self.force = Button(self.canvas2, text="+ Force", font=("Arial", 10))
         self.force.place(x=20, y=80)
@@ -300,13 +291,14 @@ class Vue:
         self.range.place(x=20, y=110)
         self.force.bind("<ButtonRelease-1>", lambda event: "")
         self.boutton_close.bind("<ButtonRelease-1>", lambda event: self.canvas2.destroy())
-        # self.canvas2.pack()
+        #self.canvas2.pack()
+
 
 
 class Projectile:
     def __init__(self, parent, cible, force, empoisone, vitesse, type):
-        self.x, self.y = parent.x * parent.parent.taille_case, parent.y * parent.parent.taille_case
-        self.force = force
+        self.x, self.y = parent.x, parent.y
+        self.position_initiale = (10,50)
         self.cible = cible
         self.empoisone = empoisone
         self.vitesse = vitesse
@@ -451,7 +443,7 @@ class Modele:
         self.rayon_pro = 5
         self.rayon_ecl = 3
         self.rayon_poi = 4
-        self.taille_case = 30
+        self.taille_case = 35
         self.largeur_grille = 32
         self.hauteur_grille = 24
         self.argent = 100
@@ -461,6 +453,19 @@ class Modele:
         self.start = 0
         self.projectiles = []
         self.argent_par_creep = 15
+        x_position_tour = 7
+        y_position_tour = 10
+        type_tour = "standard"
+        cout_amelioration = 50
+        range_tour = 300
+
+        tour_test = Tour(self, x_position_tour, y_position_tour, type_tour, cout_amelioration, range_tour)
+        self.tours.append(tour_test)
+
+        x_position_tour = 3
+        y_position_tour = 10
+        tour_test = Tour(self, x_position_tour, y_position_tour, type_tour, cout_amelioration, range_tour)
+        self.tours.append(tour_test)
 
     def deplacer_creeps(self):
         for creep in self.creeps:
@@ -530,7 +535,6 @@ class Controler:
                 else:
                     self.modele.start_round()
             for tour in self.modele.tours:
-
                 if self.modele.creeps:
                     tour.attacker()
             self.vue.afficher_temps(f"{time.time() - self.modele.start:0.2f}")
