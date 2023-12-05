@@ -17,6 +17,7 @@ class Vue:
         #self.afficher_debut()
 
 
+
     def creer_page_jeu(self):
         self.cadre_jeu = Frame(self.root)
         self.cadre_jeu.pack()
@@ -228,10 +229,12 @@ class Vue:
                                                           x + taille_case * 1.5, y + taille_case * 1.5,
                                                           fill="DarkGoldenrod1")
 
-            self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
-            self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
-            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourPoison.append(self.tour))
-            self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
+            #self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
+            #self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
+            #self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourPoison.append(self.tour))
+            #self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
+            self.modele.tours.append( Tour(self,5,5,"poison",20,500))
+
 
 
     def afficher_tour_projectile(self):
@@ -249,7 +252,7 @@ class Vue:
 
             self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
             self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
-            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourProjectile.append(self.tour))
+            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourProjectile.append(self.tour), self.canevas.unbind())
             self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
     def afficher_tour_eclaire(self):
         if self.modele.argent >= self.modele.cout_init_ecl:
@@ -292,9 +295,8 @@ class Vue:
 class Projectile:
     def __init__(self, parent, cible, force, empoisone, vitesse, type):
         self.x, self.y = parent.x, parent.y
-        self.position_initiale = (10,50)
-        self.cible = cible
         self.force = force
+        self.cible = cible
         self.empoisone = empoisone
         self.vitesse = vitesse
         self.type = type
@@ -302,25 +304,39 @@ class Projectile:
         self.position_cible = (self.cible.x, self.cible.y)
         self.cibleX = cible.x
         self.cibleY = cible.y
+        self.alive = True
+
         ##print(cible.x,cible.y)
 
     def deplacer_vers_cible(self):
-        if self.cible:
-            direction_x = self.cible.x - self.x
-            direction_y = self.cible.y - self.y
 
-            distance = math.sqrt(direction_x ** 2 + direction_y ** 2)
-            if distance != 0:
-                direction_x /= distance
-                direction_y /= distance
+     if self.alive:
+        direction_x = self.cibleX - self.x
+        direction_y = self.cibleY - self.y
 
-            self.x += direction_x * self.vitesse
-            self.y += direction_y * self.vitesse
+        distance = math.sqrt(direction_x ** 2 + direction_y ** 2)
 
-            # Vérifier si le projectile a atteint sa cible (ou à proximité)
-            if math.sqrt((self.cible.x - self.x) ** 2 + (self.cible.y - self.y) ** 2) < self.vitesse:
-                self.parent.delete_projectile(self)
-                self.parent.parent.delete_creep()
+        if distance != 0:
+            direction_x /= distance
+            direction_y /= distance
+
+        self.x += direction_x * self.vitesse
+        self.y += direction_y * self.vitesse
+
+        # Vérifier si le projectile a atteint sa cible (ou à proximité)
+        if math.sqrt((self.cibleX - self.x) ** 2 + (self.cibleY - self.y) ** 2) < self.vitesse:
+            self.cible = 0
+            self.alive = False
+
+            taille_case = self.parent.parent.taille_case / 2
+            for creep in self.parent.parent.creeps:
+                if creep.x + taille_case > self.x and creep.x - taille_case < self.x:
+                    if creep.y + taille_case > self.y and creep.y - taille_case < self.y:
+                        self.cible = creep
+     else:
+         self.parent.delete_projectile(self)
+         if self.cible:
+             self.parent.parent.creeps.remove(self.cible)
 
 
 
@@ -329,40 +345,45 @@ class Projectile:
 class Tour:
     def __init__(self, parent, x, y, type, cout_amelioration, range):
         self.parent = parent
-        self.x = x
-        self.y = y
+        self.x = x # case
+        self.y = y # case
         self.type = type
         self.niveau = 1
         self.cout_amelioration = cout_amelioration
-        self.range = range
+        self.range = range # radius (diametre/2)
         self.dernier_tir = 0
         self.intervalle_tir = 2
+        self.force = 10
+        self.empoisone = False
+        self.vitesse = 10
+        self.type_projectile = "standard"
+
+
 
     def peut_tirer(self):
         return time.time() - self.dernier_tir >= self.intervalle_tir
 
-    def attacker(self, cible):
+    def attacker(self):
         if self.peut_tirer():
-            if self.trouver_cible(cible) == True:
-                force = 10
-                empoisone = False
-                vitesse = 10
-                type_projectile = "standard"
-                projectile = Projectile(self, cible, force, empoisone, vitesse, type_projectile)
+            cible = self.trouver_cible()
+            if cible != False: # si cible non nul
+                projectile = Projectile(self, cible, self.force, self.empoisone, self.vitesse, self.type_projectile)
                 self.parent.ajouter_projectile(projectile)
                 self.dernier_tir = time.time()
 
     def ameliorer(self):
         pass
 
-    def trouver_cible(self, cible):
-        distance = math.sqrt((cible.x - self.x) ** 2 + (cible.y - self.y) ** 2)
-        if distance <= self.range:
-            print(distance)
-            print("a porter")
-            return True
+    def trouver_cible(self):
+        for creep in self.parent.creeps:
 
-    def delete_projectile(self, projectile):
+            distance = math.sqrt((creep.x - self.x * self.parent.taille_case) ** 2 + (creep.y - self.y * self.parent.taille_case) ** 2)
+            if distance <= self.range:
+                return creep
+        return False
+
+
+    def delete_projectile(self,projectile):
         self.parent.projectiles.remove(projectile)
 
 
@@ -374,7 +395,7 @@ class Creep:
         self.mana = mana
         self.empoisone = False
         self.temps_empoisone = 0
-        self.speed = 10
+        self.speed = 5
         self.creep_check_points = [(3, 17), (9, 17), (9, 5), (25, 5), (25, 10), (15, 10), (15, 17), (27, 17)]
         for i, point in enumerate(self.creep_check_points):
             self.creep_check_points[i] = (point[0] * self.parent.taille_case, point[1] * self.parent.taille_case)
@@ -401,7 +422,7 @@ class Modele:
         self.game_over = False
         self.parent = parent
         self.tours = []
-        self.creep_par_round = 5
+        self.creep_par_round = 20
 
         self.mana_init = 20
         self.pause_cree = True
@@ -414,7 +435,7 @@ class Modele:
         self.rayon_pro = 5
         self.rayon_ecl = 3
         self.rayon_poi = 4
-        self.taille_case = 35
+        self.taille_case = 30
         self.largeur_grille = 32
         self.hauteur_grille = 24
         self.argent = 100
@@ -432,6 +453,7 @@ class Modele:
 
         tour_test = Tour(self, x_position_tour, y_position_tour, type_tour, cout_amelioration, range_tour)
         self.tours.append(tour_test)
+
         print("range tour", range_tour)
 
     def deplacer_creeps(self):
@@ -444,8 +466,8 @@ class Modele:
         self.creeps.append(Creep(self, case_x * self.taille_case, case_y * self.taille_case, self.mana_init * self.niveau))
         self.creep_cree -= 1
 
-    def delete_creep(self):
-        self.creeps.pop(0)
+    def delete_creep(self,creep):
+        self.creeps.remove(creep)
         self.argent += self.argent_par_creep
 
 
@@ -481,13 +503,18 @@ class Controler:
         self.vue.afficher_creep()
         self.vue.bind_start_game()
         self.vue.bind_upgrade()
+        self.tick = 0
+        self.interval_time = 20
+        self.ms_before_next_creep = 400
         # self.vue.afficher_demarrage()
         # self.boucler()
 
     def start_loop(self):
         if not self.modele.game_over:
             if self.modele.creep_cree > 0 and self.modele.round_started:
-                if self.modele.creeps[-1].y > 200:
+                self.tick += self.interval_time
+                if self.tick >= self.ms_before_next_creep:
+                    self.tick = 0
                     self.modele.creer_creep()
             elif not self.modele.creeps and self.modele.round_started:
                 self.modele.finish_round()
@@ -499,13 +526,12 @@ class Controler:
                     self.modele.start_round()
             for tour in self.modele.tours:
                 if self.modele.creeps:
-                    cible = self.modele.creeps[0]
-                    tour.attacker(cible)
+                    tour.attacker()
             self.vue.afficher_temps(f"{time.time() - self.modele.start:0.2f}")
             self.modele.deplacer_creeps()
             self.vue.afficher_creep()
             self.vue.afficher_argent()
-            self.vue.id = self.vue.root.after(20, self.start_loop)
+            self.vue.id = self.vue.root.after(self.interval_time, self.start_loop)
             for projectile in self.modele.projectiles:
                 projectile.deplacer_vers_cible()
             self.vue.afficher_projectiles()
