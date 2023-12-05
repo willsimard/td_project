@@ -217,6 +217,13 @@ class Vue:
         self.canevas.data['start_x'] = cur_x
         self.canevas.data['start_y'] = cur_y
 
+    def on_release(self,event):
+        self.canevas.tag_unbind(self.tour, '<ButtonPress-1>')
+        self.canevas.tag_unbind(self.tour, '<B1-Motion>')
+        self.canevas.tag_unbind(self.tour, '<ButtonRelease-1>')
+        self.canevas.tag_unbind(self.tour, '<Button-3>')
+        self.tourProjectile.append(self.tour)
+        self.modele.tours.append(Tour(self.modele,event.x / self.modele.taille_case,event.y / self.modele.taille_case,"standard",30,300))
     def afficher_tour_poison(self):
         if self.modele.argent >= self.modele.cout_init_poi:
             self.modele.argent -= self.modele.cout_init_poi
@@ -297,13 +304,13 @@ class Vue:
 
 class Projectile:
     def __init__(self, parent, cible, force, empoisone, vitesse, type):
-        self.x, self.y = parent.x, parent.y
-        self.position_initiale = (10,50)
+        self.parent = parent
+        self.x, self.y = parent.x * self.parent.parent.taille_case, parent.y * self.parent.parent.taille_case
         self.cible = cible
         self.empoisone = empoisone
         self.vitesse = vitesse
         self.type = type
-        self.parent = parent
+
         self.cibleX = cible.x
         self.cibleY = cible.y
         self.alive = True
@@ -453,19 +460,7 @@ class Modele:
         self.start = 0
         self.projectiles = []
         self.argent_par_creep = 15
-        x_position_tour = 7
-        y_position_tour = 10
-        type_tour = "standard"
-        cout_amelioration = 50
-        range_tour = 300
 
-        tour_test = Tour(self, x_position_tour, y_position_tour, type_tour, cout_amelioration, range_tour)
-        self.tours.append(tour_test)
-
-        x_position_tour = 3
-        y_position_tour = 10
-        tour_test = Tour(self, x_position_tour, y_position_tour, type_tour, cout_amelioration, range_tour)
-        self.tours.append(tour_test)
 
     def deplacer_creeps(self):
         for creep in self.creeps:
