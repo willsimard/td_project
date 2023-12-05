@@ -392,6 +392,7 @@ class Tour:
                 return creep
         return False
 
+
     def delete_projectile(self, projectile):
         self.parent.projectiles.remove(projectile)
 
