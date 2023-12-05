@@ -252,7 +252,7 @@ class Vue:
 
             self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
             self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
-            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourProjectile.append(self.tour), self.canevas.unbind())
+            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourProjectile.append(self.tour))
             self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
     def afficher_tour_eclaire(self):
         if self.modele.argent >= self.modele.cout_init_ecl:
@@ -280,13 +280,16 @@ class Vue:
 
         self.boutton_close = Button(self.canvas2, text="X", font=("Arial", 13), bg="Red")
         self.boutton_close.place(x=380, y=0)
-        self.carre = self.canvas2.create_rectangle(20 ,50,
-                                                      x + taille_case*1.2, 
-                                               y + taille_case*3 , fill="deep sky blue")
+        self.carre = self.canvas2.create_rectangle(20, 50, x + taille_case*1.5, y + taille_case*3, fill="deep sky blue")
 
         self.canvas2.create_text(200,15, text="Améliorations", fill="black", font="Arial")
-        
-       
+        self.canvas2.create_text(40,65, text="Cout", fill="black", font="Arial")
+
+        self.force = Button(self.canvas2, text="+ Force", font=("Arial", 10))
+        self.force.place(x=20, y=80)
+        self.range = Button(self.canvas2, text="+ Etendu", font=("Arial", 10))
+        self.range.place(x=20, y=110)
+        self.force.bind("<ButtonRelease-1>", lambda event: "")
         self.boutton_close.bind("<ButtonRelease-1>", lambda event: self.canvas2.destroy())
         #self.canvas2.pack()
     
@@ -359,6 +362,7 @@ class Tour:
         self.type_projectile = "standard"
 
 
+        self.force = 1
 
     def peut_tirer(self):
         return time.time() - self.dernier_tir >= self.intervalle_tir
@@ -371,8 +375,9 @@ class Tour:
                 self.parent.ajouter_projectile(projectile)
                 self.dernier_tir = time.time()
 
-    def ameliorer(self):
-        pass
+    def ameliorerForce(self):
+        self.force +=2
+        self.cout_amelioration -=10
 
     def trouver_cible(self):
         for creep in self.parent.creeps:
