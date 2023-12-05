@@ -217,6 +217,13 @@ class Vue:
         self.canevas.move(self.tour, cur_x - self.canevas.data['start_x'], cur_y - self.canevas.data['start_y'])
         self.canevas.data['start_x'] = cur_x
         self.canevas.data['start_y'] = cur_y
+    def on_release(self,event):
+        self.canevas.tag_unbind(self.tour, '<ButtonPress-1>')
+        self.canevas.tag_unbind(self.tour, '<B1-Motion>')
+        self.canevas.tag_unbind(self.tour, '<ButtonRelease-1>')
+        self.canevas.tag_unbind(self.tour, '<Button-3>')
+        self.tourProjectile.append(self.tour)
+        self.modele.tours.append(Tour(self.modele, event.x / self.modele.taille_case,event.y / self.modele.taille_case,"standard",10,300))
 
     def afficher_tour_poison(self):
         if self.modele.argent >= self.modele.cout_init_poi:
@@ -224,18 +231,17 @@ class Vue:
             self.afficher_argent()
             taille_case = self.modele.taille_case
 
-            for tour in self.modele.tours:
-                x = 15 * taille_case
-                y = 19 * taille_case
-                self.tour = self.canevas.create_rectangle(x - taille_case / 2, y - taille_case / 2,
+
+            x = 15 * taille_case
+            y = 19 * taille_case
+            self.tour = self.canevas.create_rectangle(x - taille_case / 2, y - taille_case / 2,
                                                           x + taille_case / 2, y + taille_case / 2,
                                                           fill="DarkGoldenrod1")
 
-            # self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
-            # self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
-            # self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourPoison.append(self.tour))
-            # self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
-            self.modele.tours.append(Tour(self, 5, 5, "poison", 20, 500))
+            self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
+            self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
+            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.on_release(e))
+            self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
 
     def afficher_tour_projectile(self):
         if self.modele.argent >= self.modele.cout_init_pro:
@@ -243,16 +249,16 @@ class Vue:
             self.afficher_argent()
             taille_case = self.modele.taille_case
 
-            for tour in self.modele.tours:
-                x = 15 * taille_case
-                y = 19 * taille_case
-                self.tour = self.canevas.create_rectangle(x + taille_case / 2, y + taille_case / 2,
-                                                          x + taille_case * 1.5,
-                                                          y + taille_case * 1.5, fill="Red")
 
+            x = 15 * taille_case
+            y = 19 * taille_case
+
+            self.tour = self.canevas.create_rectangle(x + taille_case / 2, y + taille_case / 2,
+                                                      x + taille_case * 1.5,
+                                                      y + taille_case * 1.5, fill="Red")
             self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
             self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
-            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourProjectile.append(self.tour))
+            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.on_release(e))
             self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
 
     def afficher_tour_eclaire(self):
@@ -261,16 +267,16 @@ class Vue:
             self.afficher_argent()
             taille_case = self.modele.taille_case
 
-            for tour in self.modele.tours:
-                x = 15 * taille_case
-                y = 19 * taille_case
-                self.tour = self.canevas.create_rectangle(x - taille_case / 2, y - taille_case / 2,
+
+            x = 15 * taille_case
+            y = 19 * taille_case
+            self.tour = self.canevas.create_rectangle(x - taille_case / 2, y - taille_case / 2,
                                                           x + taille_case /2 ,
                                                           y + taille_case /2, fill="deep sky blue")
 
             self.canevas.tag_bind(self.tour, '<ButtonPress-1>', lambda e: self.on_press(e))
             self.canevas.tag_bind(self.tour, '<B1-Motion>', lambda e: self.on_drag(e))
-            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.tourEclaire.append(self.tour))
+            self.canevas.tag_bind(self.tour, '<ButtonRelease-1>', lambda e: self.on_release(e))
             self.canevas.tag_bind(self.tour, '<Button-3>', lambda e: self.afficher_amelioration())
 
     def afficher_amelioration(self):
@@ -455,19 +461,6 @@ class Modele:
         self.start = 0
         self.projectiles = []
         self.argent_par_creep = 15
-        x_position_tour = 7
-        y_position_tour = 10
-        type_tour = "standard"
-        cout_amelioration = 50
-        range_tour = 300
-
-        tour_test = Tour(self, x_position_tour, y_position_tour, type_tour, cout_amelioration, range_tour)
-        self.tours.append(tour_test)
-
-        x_position_tour = 3
-        y_position_tour = 10
-        tour_test = Tour(self, x_position_tour, y_position_tour, type_tour, cout_amelioration, range_tour)
-        self.tours.append(tour_test)
 
     def deplacer_creeps(self):
         for creep in self.creeps:
@@ -537,6 +530,7 @@ class Controler:
                 else:
                     self.modele.start_round()
             for tour in self.modele.tours:
+
                 if self.modele.creeps:
                     tour.attacker()
             self.vue.afficher_temps(f"{time.time() - self.modele.start:0.2f}")
