@@ -355,7 +355,7 @@ class Tour:
                 type_projectile = "standard"
                 projectile = Projectile(self, cible, force, empoisone, vitesse, type_projectile)
                 self.parent.ajouter_projectile(projectile)
-                self.dernier_tir = time.time()
+                self.dernier_tir = time.time
 
     def ameliorerForce(self):
         self.force +=2
