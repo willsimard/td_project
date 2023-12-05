@@ -1,3 +1,10 @@
+# Projet TD
+# Coéquipiers :
+# Nathan Sunol-Leroux
+# William Simard
+# Olivier Charette
+# Lyam Tremblay Martinez
+
 from tkinter import *
 import time
 import math
