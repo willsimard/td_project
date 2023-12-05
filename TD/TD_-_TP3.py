@@ -377,7 +377,7 @@ class Tour:
             if cible != False:  # si cible non nul
                 projectile = Projectile(self, cible, self.force, self.empoisone, self.vitesse, self.type_projectile)
                 self.parent.ajouter_projectile(projectile)
-                self.dernier_tir = time.time
+                self.dernier_tir = time.time()
 
     def ameliorerForce(self):
         self.force += 2
